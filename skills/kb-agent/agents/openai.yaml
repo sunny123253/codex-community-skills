@@ -1,0 +1,16 @@
+interface:
+  display_name: "Zotero Knowledge Agent"
+  short_description: "Search and synthesize the local Zotero/MinerU library"
+  default_prompt: "Use the local Zotero knowledge base as evidence and cite the exact paper and file for each important claim."
+policy:
+  allow_implicit_invocation: true
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "zotero_kb"
+      description: "Read-only local Zotero/MinerU knowledge base"
+      transport: "stdio"
+    - type: "mcp"
+      value: "kb_writer"
+      description: "Approval-gated writer for project 文本/ artifacts"
+      transport: "stdio"

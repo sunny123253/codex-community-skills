@@ -1,0 +1,214 @@
+# Tavotto 能改什么、不能改什么
+
+判断标准很实在：Tavotto 把 figure 常驻在内存里，直接 mutate matplotlib 的 artist
+再重画。**能被 artist 属性表达的改动就能鼠标改；需要重建图形结构的就得回代码。**
+
+这条界线对三条入口是**同一条**：Codex 里的 MCP 工具（`tavotto_apply_overrides`）、
+Codex 内嵌画布、Tavotto 桌面窗口——背后是同一个引擎、同一套 override 语义。
+
+> 可改的属性不用背：`tavotto_open_figure` 回来的 manifest 里，每个元素的
+> `editable` 就是它的完整属性表（`prop` / `type` / 当前 `value` / 枚举 `options` /
+> 数值 `min`/`max`/`step`）。**照着它发 patch，别猜 prop 名。**
+
+## 鼠标能改（别写进代码里反复调）
+
+| 类别 | 能做的事 |
+| --- | --- |
+| 文字 | 标题、轴标签、刻度标签、图例条目、图内 text：内容、字号、字体、颜色、粗细斜体、对齐、**拖动位置** |
+| 线 | 颜色、线宽、线型、透明度、marker 形状/大小/填充；散点 marker 整体替换 |
+| 形状 | 渐变填充的峰 / 色带（几百条小色块拼成、再裁成峰形）按两端颜色改，渐变保留——manifest 里那条 `prop: "gradient"` 照它的值形状发，别逐条改 facecolor；`add_patch` 的任意形状、`ax.fill()` 的多边形、pie 的扇形、`axhspan/axvspan` 的色带、`stairs` 的阶梯：填充色、描边色/宽/线型、**花纹（hatch）**、透明度 |
+| 集合 | `fill_between` / `stackplot` / `violinplot` 的填充、`pcolormesh` / `hist2d` / heatmap 的网格、`contour` 的等值线、`eventplot` 的事件线、`stem` 的茎、`quiver` 的矢量场：描边色/宽/线型、花纹、透明度、层级；**颜色映射类**（cmap/vmin/vmax） |
+| 数据系列 | 柱形（`bar`/`hist`）、误差棒、茎叶（`stem`）整组统一改 |
+| 图例 | 位置（拖）、列数、字号、边框、条目顺序 |
+| 刻度 | 朝内/朝外、长度、宽度、标签字号与颜色（x/y/z 三轴） |
+| 子图 | 位置与大小（拖、缩放） |
+| 箭头 | 脚本里 `add_patch` 的独立箭头：整体拖、拖单个端点、换 arrowstyle/线型 |
+| 3D | 视角（elev/azim/roll）、投影方式、轴线/背景面板/网格、轴箭头开关与样式 |
+| 画布层（桌面窗口） | 多图拼版、加文字/箭头/形状标注（文字可旋转、横排 / 竖排，图内文字可复制为标注）、(a)(b) 编号、对齐分布、拖边留白 / 裁剪、版本时间线、导出 PDF/PNG |
+
+改完可以「写回原始文件」——Tavotto 会把这些 override 烙进磁盘上的 PDF/PNG，
+**你的脚本一个字都不改**（写回只在桌面窗口里有，MCP 那边不提供）。
+
+## override 的两条语义（发 patch 前必读）
+
+* **全量列表**：`patches` 是这张图当前的完整修改清单，不是增量。列表里没有的
+  `(gid, prop)` 会被自动恢复成脚本原始值——这正是「撤销」的实现方式。
+  发增量的后果是：你以为只改了一项，实际上把别的修改全撤销了。
+* **形状不合法的条目不会静默丢**：`tavotto_apply_overrides` 的响应里有 `rejected`
+  （带 index 与原因，如 `bad_gid` / `non_finite_float`）。元素不存在则出现在
+  `warnings` 里（多半是脚本改过了：先 `tavotto_refresh_project` 让 Tavotto 跟上，会话要继续用就重开）。两者都要看。
+
+## 出版规范预检查什么
+
+`tavotto_preflight` 按 profile（默认 `lab-publication-v1`）体检，四档：
+
+| 等级 | 含义 | 举例 |
+| --- | --- | --- |
+| `errors` | **默认阻止导出** | 最终有效字号 ≤ 8pt、位图 <300dpi、越界、缺素材、渲染失败、override 没应用上 |
+| `warnings` | 放行但要展示 | 页面比例不符、图例带框、刻度朝外、坐标轴不封闭、线宽不在档位、字体被替代、缺中文 fallback |
+| `not_verifiable` | **查不了，需人工确认** | 外部位图内部的文字字号；没有 manifest 的矢量面板 |
+| `suggestions` | 建议 | 柱状图没误差棒、拟合没置信带、色系不在推荐表里、多条曲线都没 marker、刻度标签超过 10 个、轴标题不是 `Title (unit)` |
+
+**字号按最终物理尺寸判**：面板缩到 60% 摆上版面时，判据是 `fontsize × 0.6`。
+只把脚本里的 `fontsize` 调大而把图缩小，预检照样拦。
+
+## 保留式规范化（`tavotto_normalize_figure`）守什么
+
+它是一条**事务**：以打开时的状态为基准 B0，只改用户点名的目标，验不过就整个
+回到 B0。三张表：
+
+| 默认受保护（不点名就不动） | 明确要求才改 | 测量到必要时才做的局部适配（有预算） |
+| --- | --- | --- |
+| 数据、曲线 / 系列的数量与身份、坐标范围、线性 / 对数、轴方向、色标范围、配色、线型、marker、网格、背景、标题与标注文字、图例条目及顺序、显式设过的刻度、子图数量与排列、显式的数据纵横比 | `width_mm` / `height_mm`（只给一个时另一边按原长宽比）、`font_family`（含刻度）、`min_font_pt`（只补低于阈值的）、`font_size_pt`（统一字号） | 子图外边距 / 间距（`axes.position`；每条边相对 B0 按比例缩放后的位置最多挪新图幅的 15%，子图至少保留 60%）、图例在**自己**子图里换预设位置；最多 3 轮 |
+
+不做的事：不把图例挪到图外、不重组子图网格、不切换 / 新增 / 关闭布局引擎
+（脚本用了 `layout="tight"` / `"constrained"` 就让它自己重排）、不改长宽比、
+不缩到最小字号以下、不删内容。原本自动生成的刻度按新尺寸重算是合法的自适应，
+脚本 `set_xticks` 过的变了才算内容改动。
+
+结果里 `verdict.issues` 按稳定身份把问题分成 new / worsened / unchanged /
+improved：只有**新增或加重的确定性**干涉（文字重叠、压到别的子图、图例几何上压
+住数据、裁切）挡事务；原图已有且未加重的保留并报告；只有包围盒相交、量不到几何的
+（误差棒容器、图像）只标风险，不挡。最终文件按格式核验：PDF 页面 mm 与字体名、
+SVG 尺寸与 viewBox、PNG 像素与 pHYs dpi（TIFF 像素；EPS BoundingBox）；查不了的
+项写在 `acceptance.<fmt>.unverified`，不算通过。
+
+退出码：`done` / `nothing_to_do` / `constraint_conflict` / `budget_exceeded` /
+`font_unavailable` / `protected_changed` / `requires_authorization` /
+`acceptance_failed` / `unsupported`。除 `done` 外会话都是 B0、磁盘上没有新文件。
+
+## 必须回代码改
+
+* **数据本身**：值、单位换算、拟合、筛选。
+* **坐标范围与刻度尺度**：`set_xlim/ylim`、对数坐标、刻度定位器（盒内数据属性刻意不开放，
+  改它会让「图与数据不符」变得无法追溯）。
+* **图元几何**：曲线的点、散点的坐标、多边形的顶点、位图的像素——这些是数据。
+  （柱宽是唯一例外：排版语义明确，且改的时候柱中心不动。）
+* **颜色映射的 `norm`**（LogNorm / BoundaryNorm…）：换 norm 改的是「数据怎么被
+  解释成颜色」，属于科学结论。`vmin`/`vmax` 可以改，那只是同一个 norm 的定义域。
+* **图形结构**：加/删一条曲线、加/删子图、`sharex` 关系、colorbar 的方向
+  （翻转要销毁重建色条轴，会打乱内部编号）。
+* **`annotate()` 的箭头端点**：注释机制每帧重定位，拖完下一帧就弹回——所以它不给端点手柄。
+  要挪就在代码里改 `xy`/`xytext`。
+
+遇到这些时**如实告诉用户「这条得回代码改」**，不要造一个看起来能点、实际不持久的
+控件或 patch。发一个 manifest 里不存在的 `prop`，worker 会回一条 warning 然后什么都
+不发生——那不是「改好了」。
+
+## 写脚本时的注意点（会影响可编辑性）
+
+* **`imshow` 的位图** 只能整体改透明度/位置，像素内容不可编辑；矢量元素照常。
+* **按数值上色的图元不给「填充色」**（`scatter(c=…)`、`pcolormesh`、`contourf`、
+  `hexbin`、heatmap）：它们的填充色每次重画都由 cmap 从数据重算，改了会被原样
+  盖回去。要换配色就改 `cmap` / `vmin` / `vmax`——manifest 里给的正是这几个。
+* **`streamplot`** 的箭头是几十个独立 artist，会在元素树里铺开一长串；
+  想整体调样式仍然回代码改 `streamplot(..., arrowsize=)`。
+* **`tight_layout()` / `constrained_layout`** 可以用；用户在 Tavotto 里拖动子图后，
+  布局以拖动结果为准。
+* **中文**：脚本里要显式设中文字体（`font.family` 里加 `Noto Sans CJK SC` /
+  `Source Han Sans` / `Microsoft YaHei`），否则导出 PDF 里是方框。
+* **`paper_style.py` 是可选的图库方言**，不是 Tavotto 的依赖。用户图库里有就沿用它的
+  `save()`；没有就直接 `fig.savefig()`，两条路 Tavotto 都认。
+* **一个脚本出多张图**是常态：每张一个独立 stem，注册表会把每个 stem 映射回本脚本。
+
+## 交接失败时的自查顺序
+
+1. 脚本和产物在同一个目录吗？（最常见）
+2. 产物名是脚本里的字面量吗？`sys.argv`、时间戳、遍历结果都不行。
+3. 入口函数无参数、且模块 import 期没有副作用吗？
+4. 同一个 stem 被两个脚本认领了吗？（输出里的 `conflicts`——Tavotto 只报告不裁决，
+   要在图库的 `tavotto_registry.json` 里手工指定归属）
+
+## MCP 工具报错时的对照表
+
+| code | 意思 | 怎么办 |
+| --- | --- | --- |
+| `path_out_of_scope` | 路径不在允许的项目根内 | 用工作目录内的路径，或让用户设 `TAVOTTO_MCP_ROOTS` |
+| `no_registry` | 这个目录不是 Tavotto 图库 | 指向含 `tavotto_registry.json` 的那一层；或先交接一次让它生成 |
+| `stem_required` | 项目里有多张图 | 带 `stem` 点名（响应里的 `stems` 是候选） |
+| `stem_not_parameterizable` | 这张图没有对应脚本 | 把 `.py` 放到产物同目录，产物名写成字面量 |
+| `preflight_blocked` | 预检有阻断项 | **先修**；用户明确要求才带 `explicit_confirm: true` |
+| `missing_dependency` | 渲染解释器缺包 | 告诉用户装哪个包，或换一个带科学栈的解释器 |
+| `workdir_confirmation_required` | 首开要先选脚本的运行目录（数据只在项目根找得到 / 两处同名数据不同 / 脚本用 glob、listdir、exists 在当前目录找数据，`reason = script_dir_evidence`）——不是失败，是缺一个决定 | 按 `structuredContent.confirmation.options` 把三档（`project_root` / `project` / `sandbox`）与各自找得到的文件念给用户选，`recommended` 有值时说明推荐；**不替用户猜**。再调一次 `tavotto_open_figure` 带 `workdir=<所选>`；这个决定按项目记住，只问一次 |
+| `dependency_preparation_required` | 脚本开跑就需要的包目标环境里没有、能一次装全——不是失败，是缺一次授权 | 按 `structuredContent.dependency_preparation.plan.requirements`（装什么）、`plan.unknown`（认不出、不会装的 import）与 `targets`（装到哪：`tavotto_managed` 不改用户环境 / `project_venv` 会改项目自己的 venv）念给用户；用户授权后再调一次 `tavotto_open_figure` 带 `prepare_dependencies=<目标>` 与 `prepare_impact_digest=<structuredContent.dependency_preparation.impact_digest 原样回显>`（缺 → `dependency_impact_required`，与此刻计划对不上 → `dependency_impact_changed`，都一个字节不装；同步安装、要联网、几十秒到几分钟）；用户不想装就带 `skip`（直接运行，缺包会以 `missing_dependency` 回来）。**不替用户授权** |
+| `explicit_python_unusable` / `project_python_unusable` | 用户显式指定的渲染解释器用不了（不在了 / 没有 matplotlib）；Tavotto 不会自动换成别的环境 | 把 `structuredContent.explicit.source` / `reason` 说给用户听，让用户在设置里重新指定或清除那条设置；不要自己去换解释器 |
+| `script_needs_arguments` | 脚本要命令行参数，这次没给（或给的被脚本自己的解析器拒绝，`arguments.argv_count` > 0） | 按 `structuredContent.arguments.schema`（从源码静态读出的建议：flags / required / choices）**向用户确认每个值**——数据文件、单位、取值都由用户说了算，不要猜；再调一次 `tavotto_open_figure` 带 `argv`（字符串数组、一项一个 token，原样传入，不要把整条命令按空格拆）。之后不带 `argv` 打开同一张图会沿用这个脚本最近一次在 Tavotto 里明确运行的参数（回包 `run_config.source`），`argv: []` 是明确不带参数 |
+| `script_needs_input` | 脚本运行到一半要用户输入（`input()` / `getpass`），这里没有能答题的界面——立即返回，不会卡住 | 请用户在 Tavotto 窗口里打开这张图并作答；`input.secret` 为真时那是口令：**不要让用户把口令发给你**，也不要替用户编一个答案 |
+| `run_config_missing` / `run_config_secret_missing` / `run_config_unsupported` | 引用的运行参数用不了：这台机器上没有 / 含口令而没保存（口令只在 Tavotto 窗口里输入） / 记录来自更新的版本 | 按 `requirements[0]`：`answer_with: "argv"` 就向用户确认参数后带 `argv` 重开；`where: "tavotto_app"` 请用户在 Tavotto 里重新输入并运行；`where: "user"` 请用户升级。**不要**去掉参数改成无参数运行 |
+| `engine_capability_missing` | 插件比本机装的 Tavotto 新：引擎不会按参数运行 / 不会采用环境建议（`capability` 说是哪一项）——这次没有运行脚本 | 请用户把 Tavotto 升级到与插件相同的版本；**不要**去掉 `argv` 改成无参数运行。`tavotto_health` 的 `engine_features` 列出引擎会什么 |
+| 带 `environment` 的 `missing_dependency` / `dependency_preparation_required` | 项目里有用户自己的 Python 环境可以用，但用不用它是用户的决定（Tavotto 不再静默采用） | 把 `structuredContent.environment.candidates`（`label` / `status` / 项目相对路径）告诉用户；用户选定后再调一次 `tavotto_open_figure` 带 `adopt_environment=<候选 id>` 与 `expected_environment_generation=<它的 generation>`（只决定用哪个环境，不安装任何东西）。被拒为 `environment_changed` 就重新给用户看候选 |
+| `tavotto_missing` | 机器上没装 Tavotto | `pipx install "tavotto[worker]"` 或装桌面版，然后重开会话 |
+| `engine_too_old` / `engine_incompatible` | 装着 pip / pipx 形态的引擎，但版本低于插件要求（或说不出要求、装残了）——**不是**只装了桌面版 | 转达 `recovery` 里的升级命令（`pipx install --force "tavotto[worker]==<版本>"`；`pip_index.mirror` 为真时带 `--index-url https://pypi.org/simple` 绕开镜像），然后重开会话；不给 `--provision` |
+
+失败结果里的 `requirements` 是「要用户决定什么、用哪个参数答」的索引：`answer_with` 是再调 `tavotto_open_figure` 时带的参数名；
+为 `null` 时看 `where`——`tavotto_app` 要用户在 Tavotto 窗口里操作，`user` 要用户自己处理（例如升级）。
+
+## 大图与多图打开（`tavotto_open_figure` / `tavotto_apply_overrides` 细则）
+
+支持 MCP Apps 的宿主会同时开出一块交互画布，用户可以直接拖；没有画布的宿主用下面同一组
+工具照样走完，不要把外部窗口叫作「内嵌画布」。**图很大时**（几百个
+元素）结果里会带 `elided`，manifest / SVG 没随本次返回——画布会自己取，你只在确实
+要逐元素 gid 时才调 `tavotto_session_state { session_id }`（只读，不重渲染）。
+
+**一个脚本出好几张独立图时不要开 N 次**——`stems` 一次全开，拿回 N 个各自
+可编辑的 `session_id`（不知道有哪些就 `discover_stems: true`，它只认注册表里
+已登记且产物在磁盘上的那些）：
+
+```
+tavotto_open_figure { "project_path": "/absolute/path/to/figures",
+                      "stems": ["XPS_C_Ti_700C", "XPS_C_Ti_800C"] }
+```
+
+批量回的是每张的**摘要 + session_id**（没有 manifest/SVG，也不挂画布——要在
+画布里改哪一张，就用 `stem` 单独开那一张）。结局看 `status`：`done` /
+`partial` / `failed`。**`partial` 是「其余都开着」**，失败那张带自己的
+`stem` 与 code，重试它一张即可，别把整批重开。
+
+* **改图** `tavotto_apply_overrides { session_id, patches, summary: true }`。
+  当前工具 schema 声明 `summary` 时，模型传 true，只读有界变更摘要；完整状态和有界的
+  最近 apply 诊断按需用 `tavotto_session_state { session_id }` 取，别为了读回执再 apply 一次。
+  旧 server 未声明这个参数时省略它；画布和旧程序化调用方仍取同一次渲染的完整响应。
+  `patches` 是 `{gid, prop, value}` 的**全量列表**——列表里没有的 `(gid, prop)`
+  会自动恢复成脚本原始值，所以**每次都要发完整的一份，不要发增量**。
+  gid 与 prop 从 manifest 的 `elements[].editable` 里取，别猜。
+
+## 已有图的规范化：完整话术（技能正文只留摘要）
+
+1. **先识别输入**：`tavotto_open_figure` 开它（脚本必须在产物旁边，否则这张图只是
+   位图 / 轮廓文字，改不了字号字体——如实告诉用户，不要缩放位图冒充「已改字号」）。
+   打开回来的状态就是本次的原图基准 B0。
+3. **它自己会**：只改点名的属性；在真实渲染上检测裁切 / 文字重叠 / 图例压数据；
+   需要时做**有预算的**局部适配（外边距、子图间距、图例在自己子图内换预设位置）；
+   导出并核验**最终文件本身**（PDF 页面尺寸与字体、PNG 像素与 dpi）；四件事同时
+   成立才提交，否则会话回到 B0、不出文件。
+4. **按结果说话**，工具被调用成功 / 文件生成了都不是「任务完成」——看 `exit`：
+   * `done`：向用户说清**明确要求的修改**、**必要的局部调整**（多少 mm）、
+     **保留的原有问题**（`verdict.issues.*.unchanged`，原图本来就有、这次没加重的，
+     不顺手修）、以及规范与用户要求冲突之处（`profile_conflicts`，按用户要求执行了）。
+   * `constraint_conflict` / `budget_exceeded`：装不下。把具体冲突念给用户（哪条文字
+     压了什么、需要多少 mm 只有多少 mm），**列出需要放宽的最小约束**（更大的宽度 /
+     用户允许缩小字号 / 允许把图例移到图外 / 允许改结构），让用户选，**不要自己放宽**。
+   * `font_unavailable`：那个字体这台机器上没装，Tavotto 没有替代。告诉用户装字体或
+     换字体；**不要**自己换一个相近字体再宣称达标。
+   * `requires_authorization` / `protected_changed`：需要用户明确提出新要求。
+   * `acceptance_failed`：文件没过验收，没有交付；把 `failed_files` 的原因如实报告。
+
+## 修改绘图脚本之后：让 Tavotto 自己更新
+
+新建、修改、重命名或删除了绘图脚本（用户要求改数据 / 坐标范围 / 加曲线这类必须回
+代码的改动之后），按这七步收尾——**不要要求用户手动刷新或重启 Tavotto**：
+
+1. 保存代码（脚本与产物同目录，契约不变）；
+2. 调 `tavotto_refresh_project`（有会话就传 `session_id`，否则传 `project_path`）；
+3. 读返回的 `registry`（新增 / 移除 / 变更了哪些脚本）与 `readiness`（每张图的状态）；
+4. 状态是 `editable` 的图：告诉用户 Tavotto 已更新、可以直接在里面改；
+5. 状态是 `needs_probe` 的：说明需要用户在 Tavotto 里点一次「试运行并连接」——**不要猜**
+   它会产出哪张图，也不要替用户跑脚本；
+6. 状态是 `conflict` 的：把候选脚本列给用户，**不自动裁决**；
+7. `delivered: local` 说明 Tavotto 没开着（或是桌面版）：刷新已在本地完成，用户下次打开
+   项目时自动生效；开着的桌面版会由它自己的 watcher 在两秒内跟上。
+
+这条工具**不运行脚本**。开着的 MCP 会话仍然端着改动前的图：要在会话里继续用
+`tavotto_apply_overrides` 改这张图，就 `tavotto_close_session` 再 `tavotto_open_figure`
+重开一次；只是让 Tavotto 界面跟上，则刷新就够了。用户撞上 Tavotto 自身的缺陷时，按
+`references/issue-reporting.md` 写脱敏的 issue 草稿——**用户明确允许才外发**。

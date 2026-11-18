@@ -1,0 +1,6 @@
+interface:
+  display_name: "科研与写作"
+  short_description: "贯通选题、文献、论证、图件、论文写作与修回，按任务加载模块"
+  default_prompt: "使用 $research-suite 完成当前科研或写作任务，依据真实材料组织论证，保留科学含义并交付所需成果。"
+policy:
+  allow_implicit_invocation: true

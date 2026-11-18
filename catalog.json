@@ -1,0 +1,338 @@
+[
+  {
+    "name": "arxiv-database",
+    "path": "skills/arxiv-database",
+    "description": "Search and retrieve preprints from arXiv via the Atom API. Use this skill when searching for papers in physics, mathematics, computer science, quantitative biology, quantitative finance, statistics, electrical engineering, or economics by keywords, authors, arXiv IDs, date ranges, or categories.",
+    "license": "MIT",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "biorxiv-database",
+    "path": "skills/biorxiv-database",
+    "description": "Efficient database search tool for bioRxiv preprint server. Use this skill when searching for life sciences preprints by keywords, authors, date ranges, or categories, retrieving paper metadata, downloading PDFs, or conducting literature reviews.",
+    "license": "Unknown",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "file-organizer",
+    "path": "skills/file-organizer",
+    "description": "Intelligently organizes your files and folders across your computer by understanding context, finding duplicates, suggesting better structures, and automating cleanup tasks. Reduces cognitive load and keeps your digital workspace tidy without manual effort.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "geniml",
+    "path": "skills/geniml",
+    "description": "This skill should be used when working with genomic interval data (BED files) for machine learning tasks. Use for training region embeddings (Region2Vec, BEDspace), single-cell ATAC-seq analysis (scEmbed), building consensus peaks (universes), or any ML-based analysis of genomic regions. Applies to BED file collections, scATAC-seq data, chromatin accessibility datasets, and region-based genomic feature learning.",
+    "license": "BSD-2-Clause license",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "git-pushing",
+    "path": "skills/git-pushing",
+    "description": "Stage, commit, and push git changes with conventional commit messages. Use when user wants to commit and push changes, mentions pushing to remote, or asks to save and push their work. Also activate...",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "handoff",
+    "path": "skills/handoff",
+    "description": "Compact the current conversation into a handoff document for another agent to pick up.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "latex-posters",
+    "path": "skills/latex-posters",
+    "description": "Create professional research posters in LaTeX using beamerposter, tikzposter, or baposter. Support for conference presentations, academic posters, and scientific communication. Includes layout design, color schemes, multi-column formats, figure integration, and poster-specific best practices for visual communication.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "markdown-mermaid-writing",
+    "path": "skills/markdown-mermaid-writing",
+    "description": "Comprehensive markdown and Mermaid diagram writing skill. Use when creating any scientific document, report, analysis, or visualization. Establishes text-based diagrams as the default documentation standard with full style guides (markdown + mermaid), 24 diagram type references, and 9 document templates.",
+    "license": "Apache-2.0",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "nature-paper-to-patent",
+    "path": "skills/nature-paper-to-patent",
+    "description": "Convert scientific papers, theses, technical reports, source code, figures, or research manuscripts into evidence-grounded Chinese invention patent drafts. Use when an AI agent must extract patentable technical contributions, map every claimed feature to source evidence, preserve core formulas as editable Office Math, generate claim-aligned flowcharts and methodology figures, compare a paper with an existing patent, audit support and consistency, or deliver separate Chinese DOCX files for claims, specification, abstract, and abstract figure.\r",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "nature-statistics",
+    "path": "skills/nature-statistics",
+    "description": ">-\r",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "numerical-modeling",
+    "path": "skills/numerical-modeling",
+    "description": "Use when building, inspecting, modifying, running, diagnosing, or verifying numerical models in MOOSE, COMSOL Multiphysics, OpenFOAM, or CMG GEM. Covers governing equations, initial and boundary conditions, constitutive laws, meshes, solvers, convergence, numerical error, conservation, scaling analysis, and simulation results. Keep PHREEQC-only work, standalone scientific plotting, and manuscript writing with their dedicated skills.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "pathml",
+    "path": "skills/pathml",
+    "description": "Full-featured computational pathology toolkit. Use for advanced WSI analysis including multiplexed immunofluorescence (CODEX, Vectra), nucleus segmentation, tissue graph construction, and ML model training on pathology data. Supports 160+ slide formats. For simple tile extraction from H&E slides, histolab may be simpler.",
+    "license": "GPL-2.0 license",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "phreeqc-modeling",
+    "path": "skills/phreeqc-modeling",
+    "description": "Build, modify, calibrate, and verify PHREEQC geochemical models for water-rock-CO2 reactions, batch reactors, brines, kinetic mineral dissolution, equilibrium precipitation, degassing, mass-loss matching, .pqi/.phrq inputs, .sel/.out outputs, and PHREEQC database selection. Use when the user asks to reproduce geochemical experiments, translate paper methods into PHREEQC, set kinetic/surface-area parameters, simulate carbonate dissolution/precipitation, or run/check PHREEQC models.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "ponytail",
+    "path": "skills/ponytail",
+    "description": ">",
+    "license": "MIT",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "pytorch-lightning",
+    "path": "skills/pytorch-lightning",
+    "description": "Deep learning framework (PyTorch Lightning). Organize PyTorch code into LightningModules, configure Trainers for multi-GPU/TPU, implement data pipelines, callbacks, logging (W&B, TensorBoard), distributed training (DDP, FSDP, DeepSpeed), for scalable neural network training.",
+    "license": "Apache-2.0 license",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "pyzotero",
+    "path": "skills/pyzotero",
+    "description": "Interact with Zotero reference management libraries using the pyzotero Python client. Retrieve, create, update, and delete items, collections, tags, and attachments via the Zotero Web API v3. Use this skill when working with Zotero libraries programmatically, managing bibliographic references, exporting citations, searching library contents, uploading PDF attachments, or building research automation workflows that integrate with Zotero.",
+    "license": "MIT License",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "research-suite",
+    "path": "skills/research-suite",
+    "description": "Unified research and academic writing workflow for evaluating ideas, searching and synthesizing literature, deep-reading papers, planning arguments and figures, drafting or revising manuscripts and proposals, polishing Chinese or English prose, checking references, reviewing submissions, and responding to reviewers. Use for 科研选题、文献综述、论文精读、学术写作、论文润色、去AI味、反防御性写作、投稿预审、修回回复及文献日报. Numerical solving, data plotting, file rendering and Zotero operations use their dedicated execution tools when needed.",
+    "license": "CC-BY-NC-SA-4.0",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "scientific-plotting",
+    "path": "skills/scientific-plotting",
+    "description": "Use when creating, editing, or reviewing scientific research figures, publication plots, Matplotlib/Seaborn/R/Origin-like charts, line plots, point-line plots, scatter plots, dot plots, axes, ticks, fonts, color palettes, markers, or grid styling.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "scientific-slides",
+    "path": "skills/scientific-slides",
+    "description": "Build slide decks and presentations for research talks. Use this for making PowerPoint slides, conference presentations, seminar talks, research presentations, thesis defense slides, or any scientific talk. Provides slide structure, design templates, timing guidance, and visual validation. Works with PowerPoint and LaTeX Beamer.",
+    "license": "MIT license",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "scikit-learn",
+    "path": "skills/scikit-learn",
+    "description": "Machine learning in Python with scikit-learn. Use when working with supervised learning (classification, regression), unsupervised learning (clustering, dimensionality reduction), model evaluation, hyperparameter tuning, preprocessing, or building ML pipelines. Provides comprehensive reference documentation for algorithms, preprocessing techniques, pipelines, and best practices.",
+    "license": "BSD-3-Clause license",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "solid-liquid-gas-figure-style",
+    "path": "skills/solid-liquid-gas-figure-style",
+    "description": "Recreate scientific line, scatter, validation, and multi-panel figures in the laboratory's solid-liquid-gas reference style. Use when restyling or creating publication figures from CSV data, especially when the reference uses a full black frame, inward ticks, Times-style text, white background, gray/red/blue curves, and open square/circle/triangle data markers.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "timesfm-forecasting",
+    "path": "skills/timesfm-forecasting",
+    "description": "Zero-shot time series forecasting with Google's TimesFM foundation model. Use for any univariate time series (sales, sensors, energy, vitals, weather) without training a custom model. Supports CSV/DataFrame/array inputs with point forecasts and prediction intervals. Includes a preflight system checker script to verify RAM/GPU before first use.",
+    "license": "Apache-2.0 license",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "torch-geometric",
+    "path": "skills/torch-geometric",
+    "description": "Graph Neural Networks (PyG). Node/graph classification, link prediction, GCN, GAT, GraphSAGE, heterogeneous graphs, molecular property prediction, for geometric deep learning.",
+    "license": "MIT license",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "torchdrug",
+    "path": "skills/torchdrug",
+    "description": "PyTorch-native graph neural networks for molecules and proteins. Use when building custom GNN architectures for drug discovery, protein modeling, or knowledge graph reasoning. Best for custom model development, protein property prediction, retrosynthesis. For pre-trained models and diverse featurizers use deepchem; for benchmark datasets use pytdc.",
+    "license": "Apache-2.0 license",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "transformers",
+    "path": "skills/transformers",
+    "description": "This skill should be used when working with pre-trained transformer models for natural language processing, computer vision, audio, or multimodal tasks. Use for text generation, classification, question answering, translation, summarization, image classification, object detection, speech recognition, and fine-tuning models on custom datasets.",
+    "license": "Apache-2.0 license",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "venue-templates",
+    "path": "skills/venue-templates",
+    "description": "Access comprehensive LaTeX templates, formatting requirements, and submission guidelines for major scientific publication venues (Nature, Science, PLOS, IEEE, ACM), academic conferences (NeurIPS, ICML, CVPR, CHI), research posters, and grant proposals (NSF, NIH, DOE, DARPA). This skill should be used when preparing manuscripts for journal submission, conference papers, research posters, or grant proposals and need venue-specific formatting requirements and templates.",
+    "license": "MIT license",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "xrd-analysis",
+    "path": "skills/xrd-analysis",
+    "description": "Analyze powder XRD data from raw profiles through phase identification, GSAS-II Rietveld refinement, quantitative phase estimation, and evidence-based reporting. Use for XRD files, candidate phase screening, GSAS-II projects, gypsum/calcite or other crystalline mixtures, refinement diagnostics, and phase-content reports.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "bug-hunt",
+    "path": "skills/bug-hunt",
+    "description": "复现并定位问题，给出最小修复和验证路径。",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "cmg-figure",
+    "path": "skills/cmg-figure",
+    "description": "Use when plotting three-dimensional CMG GEM CO2 transport results from .sr3 files, including gas saturation, pressure, full-grid transparency, model-boundary rendering, target-year extraction, or Chinese/English figure naming.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "code-review",
+    "path": "skills/code-review",
+    "description": "审查代码变更，优先发现缺陷、回归和缺失测试。",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "frontend-polish",
+    "path": "skills/frontend-polish",
+    "description": "优化界面细节、响应式状态和视觉一致性。",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "kb-agent",
+    "path": "skills/kb-agent",
+    "description": "Use the user's local Zotero/MinerU knowledge base to answer literature questions, find and compare papers, ground summaries and reviews, or create source-backed notes. Trigger implicitly when a request asks about the user's library or likely local papers; trigger explicitly with $kb-agent for deep research. Do not use for unrelated general questions or silent file writes.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "release-notes",
+    "path": "skills/release-notes",
+    "description": "整理面向用户的发布说明和升级注意事项。",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Locally installed personal/community skill"
+  },
+  {
+    "name": "brainstorming",
+    "path": "superpowers/skills/brainstorming",
+    "description": "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "dispatching-parallel-agents",
+    "path": "superpowers/skills/dispatching-parallel-agents",
+    "description": "Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "executing-plans",
+    "path": "superpowers/skills/executing-plans",
+    "description": "Use when you have a written implementation plan to execute in a separate session with review checkpoints",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "finishing-a-development-branch",
+    "path": "superpowers/skills/finishing-a-development-branch",
+    "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "receiving-code-review",
+    "path": "superpowers/skills/receiving-code-review",
+    "description": "Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "requesting-code-review",
+    "path": "superpowers/skills/requesting-code-review",
+    "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "subagent-driven-development",
+    "path": "superpowers/skills/subagent-driven-development",
+    "description": "Use when executing implementation plans with independent tasks in the current session",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "systematic-debugging",
+    "path": "superpowers/skills/systematic-debugging",
+    "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "test-driven-development",
+    "path": "superpowers/skills/test-driven-development",
+    "description": "Use when implementing any feature or bugfix, before writing implementation code",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "using-git-worktrees",
+    "path": "superpowers/skills/using-git-worktrees",
+    "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "using-superpowers",
+    "path": "superpowers/skills/using-superpowers",
+    "description": "Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "verification-before-completion",
+    "path": "superpowers/skills/verification-before-completion",
+    "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "writing-plans",
+    "path": "superpowers/skills/writing-plans",
+    "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "writing-skills",
+    "path": "superpowers/skills/writing-skills",
+    "description": "Use when creating new skills, editing existing skills, or verifying skills work before deployment",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "obra/superpowers"
+  },
+  {
+    "name": "tavotto-figure",
+    "path": "skills/tavotto-figure",
+    "description": "画 matplotlib 论文级图表，并用 Tavotto 继续微调（拖图例、改字号线宽、调刻度、按出版规范预检、导出矢量 PDF）；也把用户**已经画好的图**按投稿要求改宽度 / 字体 / 最小字号而不重画（保留式规范化）。用户要画图、出图、做 figure、画折线/柱状/散点/误差棒、做论文配图、scientific plot / publication figure，要把现有图改成 8 cm / 换 Times New Roman / 字号不小于 8 pt，或提到 Tavotto 时使用。",
+    "license": "See bundled notices / upstream; not specified in skill metadata",
+    "sourceGroup": "Tavotto/Tavotto 0.21.2"
+  }
+]

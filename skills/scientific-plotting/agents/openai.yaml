@@ -1,0 +1,7 @@
+interface:
+  display_name: "Scientific Plotting"
+  short_description: "Publication-style scientific figures"
+  brand_color: "#2E75B6"
+  default_prompt: "Use $scientific-plotting to create a publication-style scientific figure with the configured fonts, ticks, colors, and markers."
+policy:
+  allow_implicit_invocation: true

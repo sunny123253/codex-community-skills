@@ -1,0 +1,6 @@
+interface:
+  display_name: "数值模拟 Agent"
+  short_description: "以方程、收敛与误差分析推进 COMSOL、MOOSE、OpenFOAM、CMG 建模"
+  default_prompt: "使用 $numerical-modeling，依据当前项目的方程、初边值、特征尺度与误差要求建立和求解主模型，推进目标物理时间或状态并分析科学指标。"
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,21 @@
+font.family: Times New Roman, SimSun
+font.serif: Times New Roman, SimSun
+font.sans-serif: SimSun, Times New Roman
+mathtext.fontset: stix
+axes.unicode_minus: False
+axes.grid: False
+axes.prop_cycle: cycler('color', ['#4D4D4D', '#F23B3B', '#2E75B6', '#3CA65A', '#A879D9', '#D69A00', '#00A7A7', '#7F4C4C', '#7A7A00', '#E56B00', '#6F97C5', '#60B800'])
+axes.facecolor: white
+figure.facecolor: white
+xtick.direction: in
+ytick.direction: in
+xtick.top: False
+ytick.right: False
+xtick.minor.visible: False
+ytick.minor.visible: False
+axes.linewidth: 0.8
+lines.linewidth: 1.4
+lines.markersize: 5
+legend.frameon: False
+savefig.dpi: 300
+savefig.bbox: tight

@@ -1,0 +1,17 @@
+# Local and generated files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+node_modules/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.credential.xml
+*.log
+.DS_Store
+Thumbs.db
+memory/

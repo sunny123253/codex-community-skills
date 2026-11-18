@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solid Liquid Gas Figure Style"
+  short_description: "Recreate clean scientific plots in the lab reference style"
+  default_prompt: "Use $solid-liquid-gas-figure-style to redraw these scientific plots in the established reference style."

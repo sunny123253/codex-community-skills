@@ -1,0 +1,7 @@
+interface:
+  display_name: "CMG-FIGURE"
+  short_description: "绘制三维 CMG CO2 运移结果图"
+  default_prompt: "Use $cmg-figure to plot full 3D CMG CO2 saturation and pressure results from SR3 files."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,4 @@
+interface:
+  display_name: "PHREEQC Modeling"
+  short_description: "Build and verify PHREEQC geochemical models"
+  default_prompt: "Use $phreeqc-modeling to create and verify a PHREEQC water-rock-CO2 model."

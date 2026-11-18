@@ -1,0 +1,4 @@
+interface:
+  display_name: "XRD 分析"
+  short_description: "粉末 XRD 鉴定、GSAS-II 拟合与相含量分析"
+  default_prompt: "请用 $xrd-analysis 核验提供的 XRD 数据，进行物相鉴定、GSAS-II 拟合和可支持的相含量分析，输出拟合图与中文报告。"

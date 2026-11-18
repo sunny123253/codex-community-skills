@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "purpose": "Document existing resource interfaces; this manifest does not grant write authorization.",
+  "script_paths_relative_to": "library/",
+  "interfaces": [
+    {
+      "id": "reading-pipeline",
+      "path": "reading/scripts/run_pipeline.py",
+      "help_args": ["--help"],
+      "required_options": ["--input", "--workdir", "--language", "--save-mode", "--zotero-mode"],
+      "language_values": ["en", "zh-CN"],
+      "completion_stage": "synthesis-bundle",
+      "write_scope": ["run-files"],
+      "zotero_mutation": false
+    },
+    {
+      "id": "note-save",
+      "path": "reading/scripts/write_obsidian_note.py",
+      "help_args": ["--help"],
+      "required_options": ["--content-file", "--lint-json", "--figure-decisions", "--source-manifest", "--language", "--preflight", "--save-mode"],
+      "language_values": ["en", "zh-CN"],
+      "completion_stage": "formal-save",
+      "write_scope": ["authorized-note-directory", "requested-status-output"],
+      "zotero_mutation": false
+    },
+    {
+      "id": "zotero-search",
+      "path": "zotero/scripts/zotero_review.py",
+      "help_args": ["search", "--help"],
+      "required_options": ["--max-results", "--start-result", "--abstract-start"],
+      "write_scope": [],
+      "zotero_mutation": false
+    },
+    {
+      "id": "zotero-markdown",
+      "path": "zotero/scripts/zotero_review.py",
+      "help_args": ["markdown", "--help"],
+      "required_options": ["--headings", "--start-line", "--max-lines", "--attachment-key"],
+      "write_scope": [],
+      "zotero_mutation": false
+    },
+    {
+      "id": "academic-discovery",
+      "path": "search/scripts/academic_search.py",
+      "help_args": ["--help"],
+      "required_options": ["--require-abstract", "--limit", "--sort"],
+      "write_scope": [],
+      "zotero_mutation": false
+    },
+    {
+      "id": "abstract-lookup",
+      "path": "search/scripts/abstract_lookup.py",
+      "help_args": ["--help"],
+      "required_options": ["--doi", "--arxiv-id", "--openalex-id", "--pmid", "--timeout"],
+      "write_scope": [],
+      "zotero_mutation": false
+    },
+    {
+      "id": "citation-converter",
+      "path": "search/scripts/format-converter.py",
+      "help_args": ["--help"],
+      "required_options": ["--doi", "--format"],
+      "write_scope": ["requested-local-export"],
+      "zotero_mutation": false
+    }
+  ]
+}

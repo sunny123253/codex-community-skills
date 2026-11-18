@@ -1,0 +1,144 @@
+# 在 Codex 以外的宿主里使用 Tavotto
+
+Tavotto 在所有宿主里是**同一份完整包、同一个 MCP 服务、同一份技能**。差别只在：
+配置写在哪、Skill 装在哪、装完之后怎样让宿主重新加载。
+
+本技能被复制到别的目录时（例如 `.claude/skills/`），**不要**按相对路径去找包里的其他
+文件。完整包的位置看 `tavotto_health` 回报的 `server.package_dir`；工具还不存在时，
+问用户把 `codex-plugin-<版本>.zip` 解压到了哪里。
+
+## 工具缺失时（本会话里没有 `tavotto_health`）
+
+按用户**当前所在的宿主**只给那一家的步骤，给完就停，不在旧会话里假装工具可用：
+
+**用户装了 Tavotto 桌面版，先走一键接入**：请他打开桌面版「设置 › 改图助手 › 接入 AI 编辑器」，
+在他用的那一家（Codex、Claude Code、Cursor、VS Code、Trae、ZCode、WorkBuddy、Claude 桌面版、
+Antigravity）那一行点「接入」，选好让 Tavotto 处理哪个文件夹里的图，然后**在那一家里新开一个会话**。
+它只改这一家用户级配置里 tavotto 那一条（改之前先备份），授权的就是选的那个文件夹；行上显示
+「未检测到」说明这台机器上没找到那一家。接入失败或用户没装桌面版，再按下面各家的步骤。
+
+**Google Antigravity**：只有桌面版的一键接入（它写 `~/.gemini/config/mcp_config.json` 与旧版
+`~/.gemini/antigravity/mcp_config.json` 里的 `mcpServers`）；下面的配置生成器还没有 `antigravity` 这一档，
+没装桌面版时请用户对照 Antigravity 的 MCP 文档，把 `--host cursor` 打印出的 `mcpServers` 片段手动合并进去，
+然后重开 Antigravity 的 Agent 会话。Skill 没有已验证的入口，必要时用 `--emit instructions` 放进规则。
+
+**Claude Code（终端 / IDE 扩展 / 桌面 Code 标签页的 Local 或 SSH 会话）优先走插件**。
+[桌面 Code 的 Cloud 会话不继承本地插件，WSL 会话不支持插件](https://code.claude.com/docs/en/desktop#install-plugins)。
+这两种环境请改用 Local Code 会话，不要让用户在本机安装后继续在原环境找工具。
+SSH 会话要在会话执行的远程机器上安装插件和引擎。在对应环境的终端逐条运行：
+
+```sh
+claude plugin marketplace add Tavotto/Tavotto --sparse .claude-plugin
+claude plugin install tavotto@tavotto
+```
+
+没装引擎再运行 `pipx install "tavotto[worker]"`。装完新开会话或运行 `/reload-plugins`，
+用 `/mcp` 确认 `plugin:tavotto:tavotto` 为 connected，再调用 `tavotto_health`。
+授权目录是 Claude Code 的启动目录和 `/add-dir` 添加的目录；不要在 HOME 里启动。
+没有内嵌画布，照常用工具打开、修改、预检、导出；要手动编辑就交接桌面版。
+不要同时保留生成器配置的同名服务。Claude Desktop 本地聊天仍走下面的配置版；
+它不为 Cloud 或 WSL Code 会话启用插件。
+
+**DeepSeek Harness：已有可用 pnpm 时才走 bundle**。DSH 的 CLI 插件管理器在安装和更新时
+需要 PATH 上的 `pnpm`。没有它，或命令提示找不到 pnpm，就按下面的配置生成器步骤选
+`--host dsh`；这条既有路径仍是 experimental，无需为 Tavotto 另装 Node.js 或 pnpm。
+不要把安装失败当成工具已可用。已有 pnpm 时，`web` 换成用户实际使用的 profile：
+
+```sh
+dsh plugin --profile web add "git+https://github.com/Tavotto/Tavotto.git#plugin-stable&path:/codex-plugin"
+```
+
+没装引擎再运行 `pipx install "tavotto[worker]"`。装完新开 DSH 会话，等 `mcp__tavotto__*`
+工具出现后调用 `tavotto_health`；bundle 自带技能。授权目录是启动 `dsh` 的目录，
+在项目里启动，不要在 HOME 里启动。没有内嵌画布，走同一套工具流程。
+bundle 与生成器给的 YAML patch 二选一，同名 serverName 的第二行会加载失败。
+
+**WorkBuddy 优先走插件**。插件市场的「添加市场」填 `Tavotto/Tavotto`，装
+`tavotto@tavotto`；没装引擎再运行 `pipx install "tavotto[worker]"`。新开对话，让它调用
+`tavotto_health`。授权目录是对话的工作目录，在项目里用，不要在 HOME 里用。
+插件自带技能；内嵌画布尚未核验，工具可独立使用。若已有生成器配置，移除重复条目。
+发现插件更新时，让用户在插件市场的已安装列表中打开 Tavotto 插件卡片，选择「更新」
+（[WorkBuddy 官方插件管理](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Plug-In)），
+完成后新开对话并调用 `tavotto_health`；不要用配置生成器代替插件更新。
+
+以上三条渠道是 Beta，依据是本地宿主冒烟（`local_smoke`），不是发行件的 `host_verified`。
+Windows 宿主流程、Claude Code 的 IDE / 桌面 Code 标签页、DSH 桌面版和真模型流程、
+WorkBuddy GUI / 画布与桌面交接仍未核验，不要把工具连通当成这些能力已经验收。
+
+**ZCode** 也能从自己的插件市场装同一份插件，但还没在登录后的真实会话里跑过工具流程；
+仍是 experimental，把这一点告诉用户。
+
+其余宿主（以及不想装插件 / bundle 的 Claude Code、DSH、WorkBuddy 用户）：
+
+1. 下载 GitHub Releases 里的 `codex-plugin-<版本>.zip`，解压到一个会长期保留的目录
+   （名字带 codex 是历史原因，内容对所有宿主都一样）。
+2. 在终端运行（路径换成真实的绝对路径）：
+
+   ```text
+   python3 <完整包>/integrations/configure.py --host <宿主> --project-root <项目绝对路径>
+   ```
+
+   Windows 上 `python3` 常常不存在，或者会打开 Microsoft Store 而不是运行 Python。请在
+   PowerShell 里用 Python 启动器 `py -3`，路径用单引号括起来：
+
+   ```text
+   py -3 '<完整包>\integrations\configure.py' --host <宿主> --project-root '<项目绝对路径>'
+   ```
+
+   `py` 也找不到，就说明这台机器没装 Python：请用户装一个 Python 3（python.org 的安装包自带
+   `py`），或者给出已装 Python 的绝对路径，例如 `& 'C:\Python312\python.exe' '<完整包>\integrations\configure.py' …`。
+
+   `<宿主>` 是 `cursor` / `zcode` / `dsh` / `workbuddy` / `claude-code` / `claude-desktop` /
+   `trae` / `vscode` / `minimax-code` 之一。Trae 的说明里还有一键安装链接（国际版 `trae://`、国内版 `trae-cn://`），
+   在浏览器地址栏打开后在 Trae 里点确认即可。它**只打印**配置（stdout）以及说明（stderr）：合并到哪个文件或界面、
+   授权的是哪个目录、引擎是否就绪、怎样确认宿主真的加载了、Skill 怎么装。它不写任何文件。
+3. 按说明合并配置，再按下表让宿主重新加载。
+
+认不出宿主，就只给第 1–2 步，并请用户对照他的客户端文档确认 MCP 配置的位置。**不要**让
+非 Codex 用户执行 `codex plugin add`。
+
+| 宿主 | 让已开的会话拿到工具 | Skill 入口 |
+| --- | --- | --- |
+| Cursor | 在 MCP 设置里确认已连接后，新开 Agent 对话 | 复制整个 `tavotto-figure/` 到 `.cursor/skills/` |
+| Claude Code（插件版） | 新开会话或 `/reload-plugins`；用 `/mcp` 确认 `plugin:tavotto:tavotto` connected | 插件自带，不用复制 |
+| Claude Code（配置版） | 重开会话，用 `/mcp` 确认 connected（项目 `.mcp.json` 第一次要批准） | 复制到 `.claude/skills/` |
+| Claude Desktop（聊天） | **完全退出**再打开 | 没有原生入口：`--emit instructions` 放进项目说明 |
+| VS Code（Copilot Agent） | MCP: List Servers → 启动 tavotto；在 Configure Tools 里勾选 | 复制到 `.github/skills/` |
+| Trae | MCP 列表确认已连接，**并把 tavotto 加进所用智能体** | 复制到 `.trae/skills/`（全局：国际版 `~/.trae/skills/`、国内版 `~/.trae-cn/skills/`） |
+| MiniMax Code | 在项目目录里重开 `mcode`（项目 `.mcp.json` 免批准自动加载） | 复制到 `.agents/skills/` 或 `.minimax/skills/` |
+| DSH（bundle） | 新开会话，等 `mcp__tavotto__*` 工具出现 | bundle 自带，不用复制 |
+| DSH（YAML patch） | 新开会话，等 `mcp__tavotto__*` 工具出现 | 复制到 `.dsh/skills/` 或 `.agents/skills/` |
+| WorkBuddy（插件版） | 新开对话，让它调用 `tavotto_health` | 插件自带，不用复制 |
+| WorkBuddy / ZCode（配置版） | 在 MCP 设置里确认已连接，重开对话 | `--emit instructions` |
+
+## 引擎不可用（只有 `tavotto_health`，或它回 `ok: false`）
+
+处理方法与 Codex 相同，见 `first-run-and-recovery.md`：按 `code` 只修那一项。**恢复命令直接用
+health 结果里 `recovery` 给的原文**，那里是这台机器上的真实路径。修完按上表重新加载。
+`desktop_only` 的意思是装了桌面版：交接可用，MCP 工具还需要一个 Python 环境。
+`engine_too_old` / `engine_incompatible` 的意思是装着 pip / pipx 形态的引擎、只是版本对不上：
+照 `recovery` 升级引擎（镜像滞后时命令里带 `--index-url https://pypi.org/simple`），不要 provision。
+
+## 能力差异（按实际情况说，不夸大）
+
+- **画布**：只有支持 MCP Apps 的宿主才会显示内嵌画布（例如 VS Code 需要开启
+  `chat.mcp.apps.enabled`，是否开启由用户或组织决定）。没有画布时，同一组工具照样能走完
+  打开 → 修改 → 预检 → 导出。`tavotto_health` 里的 `checks.host_ui_rendered` 永远是
+  `unknown_to_server`：服务器无法知道画布有没有显示出来，要问用户或看界面。
+- **授权**：配置版只有 `--project-root` 指定的项目目录，换项目就重新生成配置；Claude Code 插件版
+  按启动目录与 `/add-dir`，DSH bundle 按启动目录，WorkBuddy 插件版按对话工作目录。
+  不要让用户把 HOME 或磁盘根加进来。
+- **没有本机终端或文件写入能力的宿主**（Claude Desktop 聊天）：不能运行 `scripts/*.py`，也
+  不能把新脚本保存到本机。这种情况下直接问偏好；已有的本地图照常用 MCP 工具打开和修改；
+  新的出图脚本交给用户保存并运行。
+- **桌面版「接入」已经替你复制了技能**（Claude Code、Cursor、VS Code、ZCode、Antigravity、Trae、WorkBuddy 的用户级
+  技能目录，Tavotto 升级后重新点一次「接入」就会刷新；你自己改过的那份不会被覆盖）。没有技能目录的宿主（Claude 桌面版）
+  调 `tavotto_guide` 读这份说明；它的 `section` 可以取 `references/` 里的某一节。
+- **复制出去的技能**里，`scripts/update_check.py` 找不到包的版本信息，更新检查会显示
+  「未知」，这不是故障。升级的方法：解压新版完整包，重新生成配置，**并刷新技能**——复制过
+  `tavotto-figure/` 的，把新包里的整个目录覆盖复制过去；粘贴过等价说明的，重新运行
+  `--emit instructions` 并替换原来那段。只重新生成配置不会更新这两样，旧技能会配着新服务走过时的流程。
+- 多个宿主可以同时配置 Tavotto，各自起自己的 MCP 进程。会话会记录在 Tavotto 的数据目录里，
+  另一个进程拿到同一个 `session_id` 时，**只有在它自己的授权也覆盖那个项目时**才能接着用；
+  授权的是别的目录就拿不到（`workspace_root_changed`）。所以隔离靠的是授权目录，不是宿主本身：
+  两个宿主授权同一个项目时，它们可以互相接续会话。
